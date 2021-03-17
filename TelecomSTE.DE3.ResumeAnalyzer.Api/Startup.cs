@@ -11,6 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TelecomSTE.DE3.ResumeAnalyzer.Api.Business;
+using TelecomSTE.DE3.ResumeAnalyzer.Api.Business.Interfaces;
+using TelecomSTE.DE3.ResumeAnalyzer.Api.Configuration;
 
 namespace TelecomSTE.DE3.ResumeAnalyzer.Api
 {
@@ -26,7 +29,21 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Injection de dépendance
 
+
+            // Ajout de la configuration applicative
+            var settings = new Settings();
+            ConfigurationBinder.Bind(Configuration, settings);
+            services.AddSingleton(settings);
+            // --------
+
+            //---- Ajout des services et repos
+
+            services.AddTransient<IAnalysisDataService, AnalysisDataService>();
+
+
+            //----
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
