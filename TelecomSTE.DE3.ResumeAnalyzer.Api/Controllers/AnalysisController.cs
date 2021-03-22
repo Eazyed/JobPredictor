@@ -16,9 +16,10 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Controllers
 
         private readonly ILogger<AnalysisController> _logger;
 
-        public AnalysisController(ILogger<AnalysisController> logger)
+        public AnalysisController(ILogger<AnalysisController> logger, IAnalysisDataService analysisDataService)
         {
             _logger = logger;
+            this.analysisDataService = analysisDataService;
         }
 
         [HttpGet]

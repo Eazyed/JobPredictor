@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using TelecomSTE.DE3.ResumeAnalyzer.Api.Business;
 using TelecomSTE.DE3.ResumeAnalyzer.Api.Business.Interfaces;
 using TelecomSTE.DE3.ResumeAnalyzer.Api.Configuration;
+using TelecomSTE.DE3.ResumeAnalyzer.Api.DataAccess;
+using TelecomSTE.DE3.ResumeAnalyzer.Api.DataAccess.Interfaces;
 
 namespace TelecomSTE.DE3.ResumeAnalyzer.Api
 {
@@ -41,6 +43,7 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api
             //---- Ajout des services et repos
 
             services.AddTransient<IAnalysisDataService, AnalysisDataService>();
+            services.AddTransient<IAnalysisRepository, AnalysisRepository>();
 
 
             //----
