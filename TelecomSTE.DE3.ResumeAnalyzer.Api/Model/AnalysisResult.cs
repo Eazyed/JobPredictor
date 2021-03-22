@@ -4,11 +4,8 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Model
 {
 
-    public class AnalysisResult
+    public class AnalysisResult : MongoEntityBase
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
 
         [BsonElement("Name")]
         public string BookName { get; set; }
