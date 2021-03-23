@@ -11,10 +11,15 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.DataAccess
 {
     public class AnalysisRepository : MongoRepositoryBase<AnalysisResult>, IAnalysisRepository
     {
-        public AnalysisRepository(Settings settings, string collectionName) :
-            base(settings,collectionName)
+        public AnalysisRepository(Settings settings) :
+            base(settings,settings.MongoAnalysisCollectionName)
         {
 
+        }
+
+        public IEnumerable<AnalysisResult> GetByCategoryPredict(string category)
+        {
+            return _collection.Find(entity => entity.CategoryPredict == category).ToList();
         }
     }
 }

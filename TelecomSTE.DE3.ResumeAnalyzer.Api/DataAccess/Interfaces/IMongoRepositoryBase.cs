@@ -15,5 +15,6 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.DataAccess.Interfaces
         void Remove(string id);
         void Remove(T entityIn);
         void Update(string id, T entityIn);
+        void DropCollection();
     }
 }

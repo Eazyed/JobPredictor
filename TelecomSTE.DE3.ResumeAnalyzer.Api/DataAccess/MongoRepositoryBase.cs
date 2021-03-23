@@ -21,6 +21,8 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.DataAccess
             _collection = database.GetCollection<T>(collectionName);
         }
 
+        public void DropCollection() => _collection.DeleteMany(x => true);
+
         public List<T> Get() =>
             _collection.Find(entity => true).ToList();
 

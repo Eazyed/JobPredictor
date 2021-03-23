@@ -8,9 +8,9 @@ using TelecomSTE.DE3.ResumeAnalyzer.Api.Model;
 
 namespace TelecomSTE.DE3.ResumeAnalyzer.Api.DataAccess
 {
-    public class CategoryRepository : MongoRepositoryBase<Category>, ICategoryRepository
+    public class UpdateTimeRepository : MongoRepositoryBase<UpdateTime>, IUpdateTimeRepository
     {
-        public CategoryRepository(Settings settings) : base(settings, settings.MongoCategoryCollectionName)
+        public UpdateTimeRepository(Settings settings) : base(settings, settings.MongoUpdateTimeCollectionName)
         {
         }
     }

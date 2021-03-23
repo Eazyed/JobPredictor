@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TelecomSTE.DE3.ResumeAnalyzer.Api.Business.Interfaces;
+using TelecomSTE.DE3.ResumeAnalyzer.Api.Model;
 
 namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Controllers
 {
@@ -23,15 +24,10 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        public IEnumerable<AnalysisResult> Get()
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55)
-            })
-            .ToArray();
+            IEnumerable<AnalysisResult> a = new List<AnalysisResult>();
+            return a;
         }
     }
 }
