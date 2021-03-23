@@ -21,18 +21,17 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
         private readonly IAnalysisRepository analysisRepository;
         private readonly ICategoryRepository categoryRepository;
         private readonly IUpdateTimeRepository updateTimeRepository;
-        private readonly AmazonS3Client amazonS3Client;
+        private readonly IAmazonS3 amazonS3Client;
         private readonly Settings settings;
         private Dictionary<int, string> numberByCategory;
 
-        public AnalysisDataService(IAnalysisRepository analysisRepository, AmazonS3Client amazonS3Client, Settings settings, ICategoryRepository categoryRepository, IUpdateTimeRepository updateTimeRepository)
+        public AnalysisDataService(IAnalysisRepository analysisRepository, IAmazonS3 amazonS3Client, Settings settings, ICategoryRepository categoryRepository, IUpdateTimeRepository updateTimeRepository)
         {
             this.analysisRepository = analysisRepository;
             this.amazonS3Client = amazonS3Client;
             this.settings = settings;
             this.updateTimeRepository = updateTimeRepository;
             this.categoryRepository = categoryRepository;
-            this.numberByCategory = GetCategoryDictionary();
         }
 
         #endregion
@@ -40,6 +39,7 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
         #region Public Methods
         public AnalysisByCategoryDto GetResultsByCategory(string category)
         {
+            this.numberByCategory = GetCategoryDictionary();
             var number = this.numberByCategory.FirstOrDefault(x => x.Value == category).Key;
             var list = this.analysisRepository.GetByCategoryPredict(category);
             string text = "";

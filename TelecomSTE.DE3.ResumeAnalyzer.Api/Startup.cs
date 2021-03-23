@@ -46,14 +46,8 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api
 
             services.AddTransient<IAnalysisDataService, AnalysisDataService>();
             services.AddTransient<IAnalysisRepository, AnalysisRepository>();
-            if(settings.AwsRegion == "USEast1")
-            {
-                var options = Configuration.GetAWSOptions();
-                services.AddSingleton(new AmazonS3Client(RegionEndpoint.USEast1));
-            }
-            
-
-
+            var options = Configuration.GetAWSOptions();
+            services.AddSingleton(options.CreateServiceClient<IAmazonS3>());
             //----
             services.AddControllers();
             services.AddSwaggerGen(c =>

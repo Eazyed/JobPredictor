@@ -1,4 +1,5 @@
 using Amazon;
+using Amazon.Extensions.NETCore.Setup;
 using Amazon.S3;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
@@ -22,20 +23,17 @@ namespace NUnitTestProject1
         private readonly AnalysisDataService analysisDataService;
         public TestAnalysisDataService()
         {
-            this.settings = InitConfiguration();
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                 .Build();
+            var settings = new Settings();
+            var aws = config.GetAWSOptions();
+            ConfigurationBinder.Bind(config, settings);
+            this.settings = settings;
             this.analysisRepository = new AnalysisRepository(this.settings);
             this.categoryRepository = new CategoryRepository(this.settings);
             this.updateTimeRepository = new UpdateTimeRepository(this.settings);
-            this.analysisDataService = new AnalysisDataService(analysisRepository, new AmazonS3Client(RegionEndpoint.USEast1), settings, categoryRepository, updateTimeRepository);
-        }
-        private Settings InitConfiguration()
-        {
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .Build();
-            var settings = new Settings();
-            ConfigurationBinder.Bind(config, settings);
-            return settings;
+            this.analysisDataService = new AnalysisDataService(analysisRepository, aws.CreateServiceClient<IAmazonS3>(), settings, categoryRepository, updateTimeRepository);
         }
 
         [SetUp]
@@ -100,10 +98,17 @@ namespace NUnitTestProject1
             Assert.IsTrue(a);
         }
 
+        //[Test]
+        //public async Task UpdateData()
+        //{
+        //    await this.analysisDataService.UpdateAnalysisData();
+        //}
+
         [Test]
-        public async Task UpdateData()
+        public void GetResult()
         {
-            await this.analysisDataService.UpdateAnalysisData();
+            var a = this.analysisDataService.GetResults();
+            var b = this.analysisDataService.GetResultsByCategory("Test1");
         }
     }
 }
