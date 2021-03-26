@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TelecomSTE.DE3.ResumeAnalyzer.Api.Business.Interfaces;
 using TelecomSTE.DE3.ResumeAnalyzer.Api.Model;
+using TelecomSTE.DE3.ResumeAnalyzer.Api.Transport;
 
 namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Controllers
 {
@@ -23,11 +24,16 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Controllers
             this.analysisDataService = analysisDataService;
         }
 
-        [HttpGet]
-        public IEnumerable<AnalysisResult> Get()
+        [HttpGet("/analysis")]
+        public IEnumerable<AnalysisResultDto> GetAnalysisResult()
         {
-            IEnumerable<AnalysisResult> a = new List<AnalysisResult>();
-            return a;
+            return this.analysisDataService.GetResults(); 
+        }
+
+        [HttpGet("/wordcount")]
+        public AnalysisByCategoryDto GetWordCount(string category)
+        {
+            return this.analysisDataService.GetResultsByCategory(category);
         }
     }
 }

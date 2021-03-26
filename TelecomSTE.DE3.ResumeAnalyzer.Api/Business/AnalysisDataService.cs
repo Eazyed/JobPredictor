@@ -41,8 +41,11 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
         {
             this.numberByCategory = GetCategoryDictionary();
             var number = this.numberByCategory.FirstOrDefault(x => x.Value == category).Key;
-            var list = this.analysisRepository.GetByCategoryPredict(category);
+            var list = this.analysisRepository.GetByCategoryPredict(number.ToString());
             string text = "";
+            // Dans le cadre du projet, les données ne seront pas suffisamment 
+            // volumineuses pour poser problème, mais en situation réelle il faudrait prévoir de stocker les résultats
+            // afin de ne pas à chaque fois récupérer toutes les données pour faire les comptes
             foreach(var result in list)
             {
                 text += result.Text;
@@ -50,7 +53,6 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
 
             var words = text.Split(" ").ToList();
             var dico = words.GroupBy(x => x).ToDictionary(x => x.Key, y => y.Count());
-
             return new AnalysisByCategoryDto() {Category = category, WeightByWords=dico };
         }
 
@@ -90,10 +92,16 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
         private void UpdateAnalysisMongo(IEnumerable<PredictFile> files)
         {
             var newResults = new List<AnalysisResult>();
-            foreach(var file in files)
+            CsvHelper.Configuration.CsvConfiguration config = 
+                new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture) { 
+                    Delimiter = "|" ,
+                    HeaderValidated = null
+                };
+
+            foreach (var file in files)
             {
                 using (TextReader reader = new StringReader(file.Content))
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                using (var csv = new CsvReader(reader, config))
                 {
                     var records = csv.GetRecords<AnalysisResult>();
                     newResults.AddRange(records);

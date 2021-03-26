@@ -98,17 +98,21 @@ namespace NUnitTestProject1
             Assert.IsTrue(a);
         }
 
-        //[Test]
-        //public async Task UpdateData()
-        //{
-        //    await this.analysisDataService.UpdateAnalysisData();
-        //}
+        [Test]
+        public async Task UpdateData()
+        {
+            await this.analysisDataService.UpdateAnalysisData();
+        }
 
         [Test]
         public void GetResult()
         {
+            CreateCategory();
+            CreateAnalysisResult();
             var a = this.analysisDataService.GetResults();
             var b = this.analysisDataService.GetResultsByCategory("Test1");
+            Assert.IsTrue(b.WeightByWords.ContainsKey("Bleu"));
+            Assert.IsTrue(a.Any());
         }
     }
 }

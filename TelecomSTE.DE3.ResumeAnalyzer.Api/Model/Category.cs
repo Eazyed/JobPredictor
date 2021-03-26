@@ -9,5 +9,6 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Model
     {
         public int Number { get; set; }
         public string Label { get; set; }
+        
     }
 }
