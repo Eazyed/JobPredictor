@@ -17,9 +17,10 @@ namespace NUnitTestProject1
     public class TestAnalysisDataService
     {
         private readonly Settings settings;
-        private readonly AnalysisRepository analysisRepository;
+        private readonly AnalysisResultRepository analysisRepository;
         private readonly CategoryRepository categoryRepository;
         private readonly UpdateTimeRepository updateTimeRepository;
+        private readonly WordCountRepository wordCountRepository;
         private readonly AnalysisDataService analysisDataService;
         public TestAnalysisDataService()
         {
@@ -30,10 +31,11 @@ namespace NUnitTestProject1
             var aws = config.GetAWSOptions();
             ConfigurationBinder.Bind(config, settings);
             this.settings = settings;
-            this.analysisRepository = new AnalysisRepository(this.settings);
+            this.analysisRepository = new AnalysisResultRepository(this.settings);
             this.categoryRepository = new CategoryRepository(this.settings);
             this.updateTimeRepository = new UpdateTimeRepository(this.settings);
-            this.analysisDataService = new AnalysisDataService(analysisRepository, aws.CreateServiceClient<IAmazonS3>(), settings, categoryRepository, updateTimeRepository);
+            this.wordCountRepository = new WordCountRepository(this.settings);
+            this.analysisDataService = new AnalysisDataService(analysisRepository, aws.CreateServiceClient<IAmazonS3>(), settings, categoryRepository, updateTimeRepository,wordCountRepository);
         }
 
         [SetUp]
@@ -48,7 +50,8 @@ namespace NUnitTestProject1
         {
             this.analysisRepository.DropCollection();
             this.categoryRepository.DropCollection();
-            this.updateTimeRepository.DropCollection();            
+            this.updateTimeRepository.DropCollection();
+            this.wordCountRepository.DropCollection();
         }
 
 
@@ -95,6 +98,26 @@ namespace NUnitTestProject1
             }
 
             bool a = this.analysisRepository.Get().Count == 200;
+            Assert.IsTrue(a);
+        }
+
+        [Test]
+        public void CreateWordCount()
+        {
+            for (int i = 0; i < 29; i++)
+            {
+                WordCount wordCount = new WordCount()
+                {
+                    Category = i.ToString(),
+                    CountByWord = new System.Collections.Generic.Dictionary<string, int>()
+                    {
+                        { "Test" , 1 }                        
+                    }
+                };
+                this.wordCountRepository.Create(wordCount);
+            }
+
+            bool a = this.wordCountRepository.Get().Count == 29;
             Assert.IsTrue(a);
         }
 

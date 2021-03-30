@@ -18,17 +18,19 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
     public class AnalysisDataService : IAnalysisDataService
     {
         #region Props & ctor
-        private readonly IAnalysisRepository analysisRepository;
+        private readonly IAnalysisResultRepository analysisRepository;
         private readonly ICategoryRepository categoryRepository;
         private readonly IUpdateTimeRepository updateTimeRepository;
+        private readonly IWordCountRepository wordCountRepository;
         private readonly IAmazonS3 amazonS3Client;
         private readonly Settings settings;
         private Dictionary<int, string> numberByCategory;
 
-        public AnalysisDataService(IAnalysisRepository analysisRepository, IAmazonS3 amazonS3Client, Settings settings, ICategoryRepository categoryRepository, IUpdateTimeRepository updateTimeRepository)
+        public AnalysisDataService(IAnalysisResultRepository analysisRepository, IAmazonS3 amazonS3Client, Settings settings, ICategoryRepository categoryRepository, IUpdateTimeRepository updateTimeRepository, IWordCountRepository wordCountRepository)
         {
             this.analysisRepository = analysisRepository;
             this.amazonS3Client = amazonS3Client;
+            this.wordCountRepository = wordCountRepository;
             this.settings = settings;
             this.updateTimeRepository = updateTimeRepository;
             this.categoryRepository = categoryRepository;
@@ -41,19 +43,8 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
         {
             this.numberByCategory = GetCategoryDictionary();
             var number = this.numberByCategory.FirstOrDefault(x => x.Value == category).Key;
-            var list = this.analysisRepository.GetByCategoryPredict(number.ToString());
-            string text = "";
-            // Dans le cadre du projet, les données ne seront pas suffisamment 
-            // volumineuses pour poser problème, mais en situation réelle il faudrait prévoir de stocker les résultats
-            // afin de ne pas à chaque fois récupérer toutes les données pour faire les comptes
-            foreach(var result in list)
-            {
-                text += result.Text;
-            }
-
-            var words = text.Split(" ").ToList();
-            var dico = words.GroupBy(x => x).ToDictionary(x => x.Key, y => y.Count());
-            return new AnalysisByCategoryDto() {Category = category, WeightByWords=dico };
+            var wordCount = this.wordCountRepository.GetByCategoryPredict(number.ToString()).FirstOrDefault();
+            return new AnalysisByCategoryDto() {Category = wordCount.Category, WeightByWords=wordCount.CountByWord};
         }
 
 
@@ -108,12 +99,64 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
                 }
             }
 
-            foreach(var result in newResults)
+            if(newResults.Count > 0)
             {
-                this.analysisRepository.Create(result);
+                foreach (var result in newResults)
+                {
+                    this.analysisRepository.Create(result);
+                }
+
+                UpdateWordCount(newResults);
             }
+
         }
 
+        private void UpdateWordCount(List<AnalysisResult> newResults)
+        {
+            Dictionary<string, int> countByWord = new Dictionary<string, int>();
+
+            var resultsByCategory = newResults.GroupBy(x => x.CategoryPredict).ToDictionary( x => x.Key,y => y.ToList());
+            foreach(var categoryPair in resultsByCategory)
+            {
+                foreach (var result in categoryPair.Value)
+                {
+                    var words = result.Text.Split(" ").ToList();
+                    var currentCount = words.GroupBy(x => x).ToDictionary(x => x.Key, y => y.Count());
+                    countByWord = MergeCounts(countByWord, currentCount);
+                }
+
+                var oldCounts = this.wordCountRepository.GetByCategoryPredict(categoryPair.Key);
+
+                if (oldCounts.Count() > 0)
+                {
+                    var oldCount = oldCounts.First();
+                    oldCount.CountByWord = MergeCounts(oldCount.CountByWord, countByWord);
+                    this.wordCountRepository.Update(oldCount.Id, oldCount);
+                }
+                else
+                {
+                    this.wordCountRepository.Create(new WordCount() { Category = categoryPair.Key, CountByWord = countByWord });
+                }
+            }
+
+            
+        }
+
+        private Dictionary<string, int> MergeCounts(Dictionary<string, int> countByWord, Dictionary<string, int> currentCount)
+        {
+            foreach(var count in currentCount)
+            {
+                if (countByWord.ContainsKey(count.Key))
+                {
+                    countByWord[count.Key] += count.Value;
+                }
+                else
+                {
+                    countByWord.Add(count.Key, count.Value);
+                }
+            }
+            return countByWord;
+        }
 
         public void SetLastUpdated(DateTime date)
         {

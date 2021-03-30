@@ -9,17 +9,17 @@ using TelecomSTE.DE3.ResumeAnalyzer.Api.Model;
 
 namespace TelecomSTE.DE3.ResumeAnalyzer.Api.DataAccess
 {
-    public class AnalysisRepository : MongoRepositoryBase<AnalysisResult>, IAnalysisRepository
+    public class WordCountRepository : MongoRepositoryBase<WordCount>, IWordCountRepository
     {
-        public AnalysisRepository(Settings settings) :
-            base(settings,settings.MongoAnalysisCollectionName)
+        public WordCountRepository(Settings settings) :
+            base(settings,nameof(WordCount))
         {
 
         }
 
-        public IEnumerable<AnalysisResult> GetByCategoryPredict(string category)
+        public IEnumerable<WordCount> GetByCategoryPredict(string category)
         {
-            return _collection.Find(entity => entity.CategoryPredict == category).ToList();
+            return _collection.Find(entity => entity.Category == category).ToList();
         }
     }
 }

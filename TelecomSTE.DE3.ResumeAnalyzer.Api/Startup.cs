@@ -45,7 +45,9 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api
             //---- Ajout des services et repos
 
             services.AddTransient<IAnalysisDataService, AnalysisDataService>();
-            services.AddTransient<IAnalysisRepository, AnalysisRepository>();
+            services.AddTransient<IAnalysisResultRepository, AnalysisResultRepository>();
+            services.AddTransient<IWordCountRepository, WordCountRepository>();
+            services.AddTransient<ICategoryRepository, CategoryRepository>();
             var options = Configuration.GetAWSOptions();
             services.AddSingleton(options.CreateServiceClient<IAmazonS3>());
             //----

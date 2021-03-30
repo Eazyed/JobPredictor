@@ -10,7 +10,7 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.DataAccess
 {
     public class UpdateTimeRepository : MongoRepositoryBase<UpdateTime>, IUpdateTimeRepository
     {
-        public UpdateTimeRepository(Settings settings) : base(settings, settings.MongoUpdateTimeCollectionName)
+        public UpdateTimeRepository(Settings settings) : base(settings, nameof(UpdateTime))
         {
         }
     }

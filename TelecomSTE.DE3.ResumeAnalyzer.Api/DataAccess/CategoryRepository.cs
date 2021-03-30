@@ -10,7 +10,7 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.DataAccess
 {
     public class CategoryRepository : MongoRepositoryBase<Category>, ICategoryRepository
     {
-        public CategoryRepository(Settings settings) : base(settings, settings.MongoCategoryCollectionName)
+        public CategoryRepository(Settings settings) : base(settings, nameof(Category))
         {
         }
     }

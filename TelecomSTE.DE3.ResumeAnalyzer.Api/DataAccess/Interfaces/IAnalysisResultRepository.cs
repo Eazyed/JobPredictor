@@ -6,7 +6,7 @@ using TelecomSTE.DE3.ResumeAnalyzer.Api.Model;
 
 namespace TelecomSTE.DE3.ResumeAnalyzer.Api.DataAccess.Interfaces
 {
-    public interface IAnalysisRepository : IMongoRepositoryBase<AnalysisResult> 
+    public interface IAnalysisResultRepository : IMongoRepositoryBase<AnalysisResult> 
     {
         IEnumerable<AnalysisResult> GetByCategoryPredict(string category);
     }
