@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,16 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.DataAccess
         {
             var client = new MongoClient(settings.MongoConnectionString);
             var database = client.GetDatabase(settings.MongoDataBaseName);
-
-            _collection = database.GetCollection<T>(collectionName);
+            if (CollectionExists(collectionName,database))
+            {
+                _collection = database.GetCollection<T>(collectionName);
+            }
+            else
+            {
+                database.CreateCollection(collectionName);
+                _collection= database.GetCollection<T>(collectionName);
+            }
+            
         }
 
         public void DropCollection() => _collection.DeleteMany(x => true);
@@ -43,6 +52,15 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.DataAccess
 
         public void Remove(string id) =>
             _collection.DeleteOne(entity => entity.Id == id);
+
+        private bool CollectionExists(string collectionName, IMongoDatabase database)
+        {
+            var filter = new BsonDocument("name", collectionName);
+            //filter by collection name
+            var collections =  database.ListCollections(new ListCollectionsOptions { Filter = filter });
+            //check for existence
+            return  collections.Any();
+        }
 
     }
 }

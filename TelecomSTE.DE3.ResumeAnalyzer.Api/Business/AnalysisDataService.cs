@@ -39,34 +39,74 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
         #endregion
 
         #region Public Methods
+
+        /// <summary>
+        /// Récupération des wordcount par catégorie
+        /// </summary>
+        /// <param name="category"></param>
+        /// <returns></returns>
         public AnalysisByCategoryDto GetResultsByCategory(string category)
         {
             this.numberByCategory = GetCategoryDictionary();
             var number = this.numberByCategory.FirstOrDefault(x => x.Value == category).Key;
             var wordCount = this.wordCountRepository.GetByCategoryPredict(number.ToString()).FirstOrDefault();
-            return new AnalysisByCategoryDto() {Category = wordCount.Category, WeightByWords=wordCount.CountByWord};
+            if (wordCount != null)
+            {
+                return new AnalysisByCategoryDto() { Category = wordCount.Category, WeightByWords = wordCount.CountByWord };
+            }
+            else
+            {
+                return null;
+            }
         }
 
-
+        /// <summary>
+        /// Méthode de récupération de la date de dernier update
+        /// </summary>
+        /// <returns></returns>
         public DateTime GetLastUpdated()
         {
-            return this.updateTimeRepository.Get().First().LastUpdated;
+            var date = this.updateTimeRepository.Get().FirstOrDefault();
+            if(date == default(UpdateTime))
+            {
+                return default(DateTime);
+            }
+            else
+            {
+                return date.LastUpdated;
+            }
         }
 
+        /// <summary>
+        /// Méthode de récupération des prédictions
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<AnalysisResultDto> GetResults()
         {
+            this.numberByCategory = GetCategoryDictionary();
             var a = this.analysisRepository.Get().Select(x => AnalysisResultDto.FromModel(x,this.numberByCategory));
             return a;
         }
 
+        /// <summary>
+        /// Mise à jour des données dans Mongo
+        /// </summary>
+        /// <returns></returns>
         public async Task<DateTime> UpdateAnalysisData()
         {
+            // Récupération de la date du dernier fichier de S3 rapatrié en local
             var lastUpdated = GetLastUpdated();
+            // Récupération des clés (noms) des fichiers postérieurs à la date précédente
             var keys = await GetLatestFileKeys(lastUpdated);
+            // Récupération des fichiers à partir de leur nom
             var files = await GetFiles(keys);
+            // Mise à jour des données d'analyses dans Mongo
             UpdateAnalysisMongo(files);
+            // Récupération de la date du dernier fichier S3 rapatrié en local
             DateTime latestUpdate = files.OrderBy(x => x.LastModified).First().LastModified;
+            // Stockage de cette date
             SetLastUpdated(latestUpdate);
+            // On retourne la date pour affichage côté front
             return latestUpdate;
         }
 
@@ -201,12 +241,10 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
                         files.Add(file);
                     }
                 }
-                catch (AmazonS3Exception e)
+                catch (Exception)
                 {
-
-                }
-                catch (Exception e)
-                {
+                    // Le log serait ici
+                    throw;
                 }
             }
             return files;
@@ -227,12 +265,13 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
                 {
                     response = await amazonS3Client.ListObjectsV2Async(request);
                     // Récupération des clés des fichiers modifiés après la dernière date d'update
-                    fileKeys.AddRange(response.S3Objects.Where(x => x.LastModified > lastUpdated).Select(x => x.Key));
+                    fileKeys.AddRange(response.S3Objects.Where(x => x.LastModified.ToUniversalTime() > lastUpdated).Select(x => x.Key));
                     request.ContinuationToken = response.NextContinuationToken;
                 } while (response.IsTruncated);
             }
             catch (Exception e)
             {
+                // Log
                 throw;
             }
 

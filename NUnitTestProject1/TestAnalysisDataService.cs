@@ -124,7 +124,13 @@ namespace NUnitTestProject1
         [Test]
         public async Task UpdateData()
         {
+            var now = DateTime.UtcNow;
+            var countThen = this.analysisDataService.GetResults().Count();
             await this.analysisDataService.UpdateAnalysisData();
+            var updated = this.analysisDataService.GetLastUpdated();
+            var countNow = this.analysisDataService.GetResults().Count();
+            Assert.IsTrue(now < updated);
+            Assert.IsTrue(countNow > countThen);
         }
 
         [Test]

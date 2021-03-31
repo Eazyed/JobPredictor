@@ -43,13 +43,14 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api
             // --------
 
             //---- Ajout des services et repos
-
-            services.AddTransient<IAnalysisDataService, AnalysisDataService>();
+            services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
+            services.AddAWSService<IAmazonS3>();
             services.AddTransient<IAnalysisResultRepository, AnalysisResultRepository>();
+            services.AddTransient<IUpdateTimeRepository, UpdateTimeRepository>();
             services.AddTransient<IWordCountRepository, WordCountRepository>();
             services.AddTransient<ICategoryRepository, CategoryRepository>();
-            var options = Configuration.GetAWSOptions();
-            services.AddSingleton(options.CreateServiceClient<IAmazonS3>());
+            services.AddTransient<IAnalysisDataService, AnalysisDataService>();
+
             //----
             services.AddControllers();
             services.AddSwaggerGen(c =>

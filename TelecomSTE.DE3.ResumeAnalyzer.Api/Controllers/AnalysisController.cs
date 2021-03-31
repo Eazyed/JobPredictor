@@ -30,10 +30,23 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Controllers
             return this.analysisDataService.GetResults(); 
         }
 
+
+        [HttpGet("/update")]
+        public async Task<DateTime> UpdateResult()
+        {
+            return await this.analysisDataService.UpdateAnalysisData();
+        }
+
         [HttpGet("/wordcount")]
         public AnalysisByCategoryDto GetWordCount(string category)
         {
             return this.analysisDataService.GetResultsByCategory(category);
+        }
+
+        [HttpGet("/lastupdate")]
+        public DateTime GetLastUpdate()
+        {
+            return this.analysisDataService.GetLastUpdated();
         }
     }
 }
