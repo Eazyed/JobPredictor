@@ -89,7 +89,6 @@ namespace NUnitTestProject1
                 AnalysisResult analysisResult = new AnalysisResult()
                 {
                     OriginalId = i.ToString(),
-                    BatchTimestamp = DateTime.Now.ToString(),
                     Category= (i%29).ToString(),
                     CategoryPredict = i%2 ==0 ? (i % 29).ToString() : (i+1).ToString(),
                     Text = i % 2 == 0 ? "Test Test Test Bleu Bleu Bleu Bleu Rouge Bleu Violet Jaune Vert Vert Marron Jambon" : "Tonnerre Air Eau Feu Psy Sol Sol Psy Eau Eau Eau Electrique Plante Plante Plante"

@@ -13,7 +13,5 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Model
         public string Category { get; set; }
 
         public string CategoryPredict { get; set; }
-
-        public string BatchTimestamp { get; set; }
     }
 }
