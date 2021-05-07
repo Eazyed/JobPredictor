@@ -41,6 +41,15 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
         #region Public Methods
 
         /// <summary>
+        /// Récupération de toutes les catégories
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<string> GetCategories()
+        {
+            return this.categoryRepository.Get().Select(x => x.Label);
+        }
+
+        /// <summary>
         /// Récupération des wordcount par catégorie
         /// </summary>
         /// <param name="category"></param>
@@ -277,6 +286,8 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
 
             return fileKeys;
         }
+
+
 
         #endregion
 
