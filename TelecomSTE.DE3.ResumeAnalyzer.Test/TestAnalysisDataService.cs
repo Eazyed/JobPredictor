@@ -12,7 +12,7 @@ using TelecomSTE.DE3.ResumeAnalyzer.Api.DataAccess;
 using TelecomSTE.DE3.ResumeAnalyzer.Api.DataAccess.Interfaces;
 using TelecomSTE.DE3.ResumeAnalyzer.Api.Model;
 
-namespace NUnitTestProject1
+namespace TelecomSTE.DE3.ResumeAnalyzer.Test
 {
     public class TestAnalysisDataService
     {
@@ -110,7 +110,7 @@ namespace NUnitTestProject1
                     Category = i.ToString(),
                     CountByWord = new System.Collections.Generic.Dictionary<string, int>()
                     {
-                        { "Test" , 1 }                        
+                        { "Bleu" , 1 }                        
                     }
                 };
                 this.wordCountRepository.Create(wordCount);
@@ -123,20 +123,22 @@ namespace NUnitTestProject1
         [Test]
         public async Task UpdateData()
         {
-            var now = DateTime.UtcNow;
+            var lastUpdate = this.analysisDataService.GetLastUpdated();
+            CreateCategory();
             var countThen = this.analysisDataService.GetResults().Count();
             await this.analysisDataService.UpdateAnalysisData();
             var updated = this.analysisDataService.GetLastUpdated();
             var countNow = this.analysisDataService.GetResults().Count();
-            Assert.IsTrue(now < updated);
+            Assert.IsTrue(lastUpdate < updated);
             Assert.IsTrue(countNow > countThen);
         }
 
         [Test]
         public void GetResult()
         {
-            CreateCategory();
             CreateAnalysisResult();
+            CreateCategory();
+            CreateWordCount();
             var a = this.analysisDataService.GetResults();
             var b = this.analysisDataService.GetResultsByCategory("Test1");
             Assert.IsTrue(b.WeightByWords.ContainsKey("Bleu"));
