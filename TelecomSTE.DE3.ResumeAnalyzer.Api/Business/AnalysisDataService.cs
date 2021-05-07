@@ -170,11 +170,10 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
 
         private void UpdateWordCount(List<AnalysisResult> newResults)
         {
-            Dictionary<string, int> countByWord = new Dictionary<string, int>();
-
-            var resultsByCategory = newResults.GroupBy(x => x.CategoryPredict).ToDictionary(x => x.Key, y => y.ToList());
-            foreach (var categoryPair in resultsByCategory)
+            var resultsByCategory = newResults.GroupBy(x => x.CategoryPredict).ToDictionary( x => x.Key,y => y.ToList());
+            foreach(var categoryPair in resultsByCategory)
             {
+                Dictionary<string, int> countByWord = new Dictionary<string, int>();
                 foreach (var result in categoryPair.Value)
                 {
                     var words = result.Text.Split(" ").ToList();
