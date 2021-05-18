@@ -33,6 +33,13 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("localhost", builder =>
+                {
+                    builder.WithOrigins("http://jobpredict").AllowAnyHeader().AllowAnyMethod();
+                });
+            });
             //Injection de dépendance
 
 
@@ -68,10 +75,12 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TelecomSTE.DE3.ResumeAnalyzer.Api v1"));
             }
-
+            
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(options => options.WithOrigins("http://jobpredict").AllowAnyMethod());
 
             app.UseAuthorization();
 
