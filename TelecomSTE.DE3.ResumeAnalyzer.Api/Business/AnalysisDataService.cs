@@ -41,6 +41,15 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
         #region Public Methods
 
         /// <summary>
+        /// Récupération de toutes les catégories
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<string> GetCategories()
+        {
+            return this.categoryRepository.Get().Select(x => x.Label);
+        }
+
+        /// <summary>
         /// Récupération des wordcount par catégorie
         /// </summary>
         /// <param name="category"></param>
@@ -48,11 +57,18 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
         public AnalysisByCategoryDto GetResultsByCategory(string category)
         {
             this.numberByCategory = GetCategoryDictionary();
-            var number = this.numberByCategory.FirstOrDefault(x => x.Value == category).Key;
-            var wordCount = this.wordCountRepository.GetByCategoryPredict(number.ToString()).FirstOrDefault();
-            if (wordCount != null)
+            if (this.numberByCategory.ContainsValue(category))
             {
-                return new AnalysisByCategoryDto() { Category = wordCount.Category, WeightByWords = wordCount.CountByWord };
+                var number = this.numberByCategory.FirstOrDefault(x => x.Value == category).Key;
+                var wordCount = this.wordCountRepository.GetByCategoryPredict(number.ToString()).FirstOrDefault();
+                if (wordCount != null)
+                {
+                    return new AnalysisByCategoryDto() { Category = wordCount.Category, WeightByWords = wordCount.CountByWord };
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
             {
@@ -67,7 +83,7 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
         public DateTime GetLastUpdated()
         {
             var date = this.updateTimeRepository.Get().FirstOrDefault();
-            if(date == default(UpdateTime))
+            if (date == default(UpdateTime))
             {
                 return default(DateTime);
             }
@@ -84,7 +100,7 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
         public IEnumerable<AnalysisResultDto> GetResults()
         {
             this.numberByCategory = GetCategoryDictionary();
-            var a = this.analysisRepository.Get().Select(x => AnalysisResultDto.FromModel(x,this.numberByCategory));
+            var a = this.analysisRepository.Get().Select(x => AnalysisResultDto.FromModel(x, this.numberByCategory));
             return a;
         }
 
@@ -123,9 +139,10 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
         private void UpdateAnalysisMongo(IEnumerable<PredictFile> files)
         {
             var newResults = new List<AnalysisResult>();
-            CsvHelper.Configuration.CsvConfiguration config = 
-                new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture) { 
-                    Delimiter = "|" ,
+            CsvHelper.Configuration.CsvConfiguration config =
+                new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    Delimiter = "|",
                     HeaderValidated = null
                 };
 
@@ -139,7 +156,7 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
                 }
             }
 
-            if(newResults.Count > 0)
+            if (newResults.Count > 0)
             {
                 foreach (var result in newResults)
                 {
@@ -153,11 +170,10 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
 
         private void UpdateWordCount(List<AnalysisResult> newResults)
         {
-            Dictionary<string, int> countByWord = new Dictionary<string, int>();
-
             var resultsByCategory = newResults.GroupBy(x => x.CategoryPredict).ToDictionary( x => x.Key,y => y.ToList());
             foreach(var categoryPair in resultsByCategory)
             {
+                Dictionary<string, int> countByWord = new Dictionary<string, int>();
                 foreach (var result in categoryPair.Value)
                 {
                     var words = result.Text.Split(" ").ToList();
@@ -179,12 +195,12 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
                 }
             }
 
-            
+
         }
 
         private Dictionary<string, int> MergeCounts(Dictionary<string, int> countByWord, Dictionary<string, int> currentCount)
         {
-            foreach(var count in currentCount)
+            foreach (var count in currentCount)
             {
                 if (countByWord.ContainsKey(count.Key))
                 {
@@ -201,10 +217,10 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
         public void SetLastUpdated(DateTime date)
         {
             var updateTime = this.updateTimeRepository.Get().FirstOrDefault();
-            if(updateTime != null)
+            if (updateTime != null)
             {
                 updateTime.LastUpdated = date;
-                this.updateTimeRepository.Update(updateTime.Id,updateTime);
+                this.updateTimeRepository.Update(updateTime.Id, updateTime);
             }
             else
             {
@@ -277,6 +293,8 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business
 
             return fileKeys;
         }
+
+
 
         #endregion
 

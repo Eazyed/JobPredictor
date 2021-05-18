@@ -72,5 +72,11 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Controllers
         {
             return this.analysisDataService.GetLastUpdated();
         }
+
+        [HttpGet("/category")]
+        public IEnumerable<string> GetCategories()
+        {
+            return this.analysisDataService.GetCategories();
+        }
     }
 }
