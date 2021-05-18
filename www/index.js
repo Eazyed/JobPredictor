@@ -400,7 +400,19 @@ svg
 console.log(time);
 time = time.replace("T", " à ");
 time = time.replace("Z", "");
-var nav = document.getElementById("navigation");
-nav.innerHTML += `<li class="nav-item"><a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Mis à jour le ` + time + `</a></li>`;
+var nav = document.getElementById("imported");
+nav.innerHTML += `<a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Date du dernier fichier importé : ` + time + `</a>`;
 
 }, 1000);
+
+
+function update(){
+  axios.get('https://localhost:44353/update', {
+    params: {
+    }
+  })
+  .then(function (response) {
+    var nav = document.getElementById("imported");
+    nav.innerHTML += `<a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Import effectué</a>`;
+  })
+}
