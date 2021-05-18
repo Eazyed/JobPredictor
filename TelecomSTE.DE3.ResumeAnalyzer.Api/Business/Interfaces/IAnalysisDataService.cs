@@ -13,6 +13,8 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Business.Interfaces
 
         DateTime GetLastUpdated();
 
+        IEnumerable<string> GetCategories();
+
         IEnumerable<AnalysisResultDto> GetResults();
 
         AnalysisByCategoryDto GetResultsByCategory(string category);

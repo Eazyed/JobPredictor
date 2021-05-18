@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ using TelecomSTE.DE3.ResumeAnalyzer.Api.Transport;
 
 namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Controllers
 {
+    [EnableCors]
     [ApiController]
     [Route("[controller]")]
     public class AnalysisController : ControllerBase
@@ -31,7 +33,13 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Controllers
         [HttpGet("/analysis")]
         public IEnumerable<AnalysisResultDto> GetAnalysisResult()
         {
-            return this.analysisDataService.GetResults(); 
+            try
+            {
+                return this.analysisDataService.GetResults();
+            }catch(Exception e)
+            {
+                throw;
+            }
         }
 
         /// <summary>
@@ -63,6 +71,12 @@ namespace TelecomSTE.DE3.ResumeAnalyzer.Api.Controllers
         public DateTime GetLastUpdate()
         {
             return this.analysisDataService.GetLastUpdated();
+        }
+
+        [HttpGet("/category")]
+        public IEnumerable<string> GetCategories()
+        {
+            return this.analysisDataService.GetCategories();
         }
     }
 }

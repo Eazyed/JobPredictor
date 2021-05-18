@@ -1,0 +1,18 @@
+{
+  "name": "big-data",
+  "version": "1.0.0",
+  "description": "Web platform displaying results from the Big Data project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ROS Quentin, RUELLE Mathias, MAY Adrian",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cors": "^2.8.5",
+    "jquery": "^3.6.0",
+    "requirejs": "^2.3.6",
+    "webpack": "^5.26.0"
+  }
+}
